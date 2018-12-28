@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gilcrest/client/app"
+	"github.com/gilcrest/client-api/server"
 	"github.com/gilcrest/errors"
 	"github.com/rs/zerolog"
 )
@@ -21,7 +21,7 @@ func main() {
 
 	loglevel := logLevel(loglvlFlag)
 
-	server, err := app.NewServer(loglevel)
+	server, err := server.NewServer(loglevel)
 	if err != nil {
 		log.Fatal(err)
 	}
