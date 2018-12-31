@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gilcrest/client-api/server"
+	server "github.com/gilcrest/client-api"
 	"github.com/gilcrest/errors"
 	"github.com/rs/zerolog"
 )
