@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gilcrest/client/lib/client"
+	"github.com/gilcrest/apiclient"
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/httplog"
 	"github.com/gilcrest/srvr/datastore"
@@ -54,7 +54,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 			return
 		}
 
-		client := new(client.Client)
+		client := new(apiclient.Client)
 
 		client.Name = rqst.ClientName
 		client.HomeURL = rqst.ClientHomeURL
