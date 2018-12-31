@@ -1,7 +1,7 @@
 module github.com/gilcrest/client-api
 
 require (
-	github.com/gilcrest/apiclient v0.0.0-20181228231735-5e48e4129322
+	github.com/gilcrest/apiclient v0.2.0
 	github.com/gilcrest/errors v0.5.0
 	github.com/gilcrest/httplog v0.3.4
 	github.com/gilcrest/servertoken v0.1.0
