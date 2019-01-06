@@ -87,8 +87,20 @@ func (s *Server) handleClient() http.HandlerFunc {
 
 		// Call the CreateClientDB method of the Client object
 		// to write to the db
-		tx, err = client.CreateClientDB(ctx, tx)
+		err = client.CreateClientDB(ctx, tx)
 		if err != nil {
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				err = errors.HTTPErr{
+					Code: http.StatusBadRequest,
+					Kind: errors.Database,
+					Err:  errors.Str("Database error, contact support"),
+				}
+				errors.HTTPError(w, err)
+				return
+			}
+		}
+
+		if err := tx.Commit(); err != nil {
 			err = errors.HTTPErr{
 				Code: http.StatusBadRequest,
 				Kind: errors.Database,
@@ -96,30 +108,6 @@ func (s *Server) handleClient() http.HandlerFunc {
 			}
 			errors.HTTPError(w, err)
 			return
-		}
-
-		if !client.DMLTime.IsZero() {
-			err := tx.Commit()
-			if err != nil {
-				err = errors.HTTPErr{
-					Code: http.StatusBadRequest,
-					Kind: errors.Database,
-					Err:  errors.Str("Database error, contact support"),
-				}
-				errors.HTTPError(w, err)
-				return
-			}
-		} else {
-			err = tx.Rollback()
-			if err != nil {
-				err = errors.HTTPErr{
-					Code: http.StatusBadRequest,
-					Kind: errors.Database,
-					Err:  errors.Str("Database error, contact support"),
-				}
-				errors.HTTPError(w, err)
-				return
-			}
 		}
 
 		// If we successfully committed the db transaction, we can consider this
