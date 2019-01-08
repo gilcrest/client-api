@@ -1,5 +1,5 @@
-github.com/gilcrest/apiclient v0.3.0 h1:9I5HosW6S1iMSCZ332ZaT35WwyQccrDeh0sblAsU3Z4=
-github.com/gilcrest/apiclient v0.3.0/go.mod h1:5G5lobQ3BhHDZDVP8JBl3KjWg5Otx7X0f8334sQALe8=
+github.com/gilcrest/apiclient v0.5.0 h1:rcLpS1DT41SYomby3742Q6VFCoB+9H5B5jh3EJpcewk=
+github.com/gilcrest/apiclient v0.5.0/go.mod h1:5G5lobQ3BhHDZDVP8JBl3KjWg5Otx7X0f8334sQALe8=
 github.com/gilcrest/errors v0.5.0 h1:vYj94RgAUK4RCwPpA0U77haHnvXahSbT5IXQhTNB++0=
 github.com/gilcrest/errors v0.5.0/go.mod h1:8IIeIoFzPksn6Nk8sjcSNCB+2TKd7h8yinC0hb2pauE=
 github.com/gilcrest/httplog v0.3.5 h1:jjYHKVtp7SG4pB01wJyQIowzpdRt0T/hlDjLYIMscWc=
