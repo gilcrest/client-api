@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gilcrest/apiclient"
 	"github.com/gilcrest/errors"
@@ -34,7 +35,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 			PrimaryUserID     string         `json:"username"`
 			ClientSecret      string         `json:"client_secret"`
 			ServerToken       string         `json:"server_token"`
-			CreateTimestamp   int64          `json:"create_unix_time"`
+			CreateTimestamp   string         `json:"create_timestamp"`
 			Audit             *httplog.Audit `json:"audit"`
 		}
 
@@ -146,7 +147,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 		resp.PrimaryUserID = client.PrimaryUserID
 		resp.ClientSecret = client.Secret
 		resp.ServerToken = client.ServerToken
-		resp.CreateTimestamp = client.CreateTimestamp.Unix()
+		resp.CreateTimestamp = client.CreateTimestamp.Format(time.RFC3339)
 
 		// Encode response struct to JSON for the response body
 		json.NewEncoder(w).Encode(*resp)
