@@ -34,7 +34,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 			PrimaryUserID     string         `json:"username"`
 			ClientSecret      string         `json:"client_secret"`
 			ServerToken       string         `json:"server_token"`
-			DMLTime           int64          `json:"dml_unix_time"`
+			CreateTimestamp   int64          `json:"create_unix_time"`
 			Audit             *httplog.Audit `json:"audit"`
 		}
 
@@ -146,7 +146,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 		resp.PrimaryUserID = client.PrimaryUserID
 		resp.ClientSecret = client.Secret
 		resp.ServerToken = client.ServerToken
-		resp.DMLTime = client.DMLTime.Unix()
+		resp.CreateTimestamp = client.CreateTimestamp.Unix()
 
 		// Encode response struct to JSON for the response body
 		json.NewEncoder(w).Encode(*resp)
