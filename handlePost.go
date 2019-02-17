@@ -46,11 +46,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 		err := json.NewDecoder(req.Body).Decode(&rqst)
 		defer req.Body.Close()
 		if err != nil {
-			err = errors.HTTPErr{
-				Code: http.StatusBadRequest,
-				Kind: errors.Validation,
-				Err:  err,
-			}
+			err = errors.RE(http.StatusBadRequest, errors.InvalidRequest, err)
 			errors.HTTPError(w, err)
 			return
 		}
@@ -65,11 +61,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 
 		err = client.Finalize()
 		if err != nil {
-			err = errors.HTTPErr{
-				Code: http.StatusBadRequest,
-				Kind: errors.Validation,
-				Err:  err,
-			}
+			err = errors.RE(http.StatusBadRequest, errors.Validation, err)
 			errors.HTTPError(w, err)
 			return
 		}
@@ -77,11 +69,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 		// get a new DB Tx
 		tx, err := s.DS.BeginTx(ctx, nil, datastore.AppDB)
 		if err != nil {
-			err = errors.HTTPErr{
-				Code: http.StatusBadRequest,
-				Kind: errors.Database,
-				Err:  err,
-			}
+			err = errors.RE(http.StatusInternalServerError, errors.Database)
 			errors.HTTPError(w, err)
 			return
 		}
@@ -91,22 +79,14 @@ func (s *Server) handleClient() http.HandlerFunc {
 		err = client.CreateClientDB(ctx, tx)
 		if err != nil {
 			if rollbackErr := tx.Rollback(); rollbackErr != nil {
-				err = errors.HTTPErr{
-					Code: http.StatusBadRequest,
-					Kind: errors.Database,
-					Err:  errors.Str("Database error, contact support"),
-				}
+				err = errors.RE(http.StatusInternalServerError, errors.Database)
 				errors.HTTPError(w, err)
 				return
 			}
 		}
 
 		if err := tx.Commit(); err != nil {
-			err = errors.HTTPErr{
-				Code: http.StatusBadRequest,
-				Kind: errors.Database,
-				Err:  errors.Str("Database error, contact support"),
-			}
+			err = errors.RE(http.StatusInternalServerError, errors.Database)
 			errors.HTTPError(w, err)
 			return
 		}
@@ -114,23 +94,9 @@ func (s *Server) handleClient() http.HandlerFunc {
 		// If we successfully committed the db transaction, we can consider this
 		// transaction successful and return a response with the response body
 
-		// create new AuditOpts struct and set options to true that you
-		// want to see in the response body (Request ID is always present)
-		aopt := new(httplog.AuditOpts)
-		aopt.Host = true
-		aopt.Port = true
-		aopt.Path = true
-		aopt.Query = true
-
-		// get a new httplog.Audit struct from NewAudit using the
-		// above set options and request context
-		aud, err := httplog.NewAudit(ctx, aopt)
+		aud, err := httplog.NewAudit(ctx)
 		if err != nil {
-			err = errors.HTTPErr{
-				Code: http.StatusInternalServerError,
-				Kind: errors.Other,
-				Err:  err,
-			}
+			err = errors.RE(http.StatusInternalServerError, errors.Unanticipated)
 			errors.HTTPError(w, err)
 			return
 		}
@@ -152,11 +118,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 		// Encode response struct to JSON for the response body
 		json.NewEncoder(w).Encode(*resp)
 		if err != nil {
-			err = errors.HTTPErr{
-				Code: http.StatusInternalServerError,
-				Kind: errors.Other,
-				Err:  err,
-			}
+			err = errors.RE(http.StatusInternalServerError, errors.Internal)
 			errors.HTTPError(w, err)
 			return
 		}
