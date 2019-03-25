@@ -2,37 +2,47 @@ package main
 
 import (
 	"flag"
-	"log"
 	"net/http"
 
-	server "github.com/gilcrest/client-api"
-	"github.com/gilcrest/errors"
+	"github.com/gilcrest/client-api/server"
+	"github.com/gilcrest/env"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	const op errors.Op = "srvr.main"
 
-	// flag allows for setting logging level, e.g. to run the server
+	// loglvl flag allows for setting logging level, e.g. to run the server
 	// with level set to debug, it'd be: ./server loglvl=debug
 	loglvlFlag := flag.String("loglvl", "error", "sets log level")
 
+	// env flag allows for setting environment, e.g. Production, QA, etc.
+	// example: env=dev, env=qa, env=stg, env=prod
+	envFlag := flag.String("env", "dev", "sets log level")
+
 	flag.Parse()
 
+	// get appropriate zerolog.Level based on flag
 	loglevel := logLevel(loglvlFlag)
+	log.Log().Msgf("Logging Level set to %s", loglevel)
 
-	server, err := server.NewServer(loglevel)
+	// get appropriate env.Name based on flag
+	eName := envName(envFlag)
+	log.Log().Msgf("Environment set to %s", eName)
+
+	// call constructor for Server struct
+	server, err := server.NewServer(eName, loglevel)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("")
 	}
 
 	// handle all requests with the Gorilla router
 	http.Handle("/", server.Router)
 
-	// ListenAndServe on port 8008, not specifying a particular IP address
+	// ListenAndServe on port 8080, not specifying a particular IP address
 	// for this particular implementation
-	if err := http.ListenAndServe(":8008", nil); err != nil {
-		log.Fatal(err)
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatal().Err(err).Msg("")
 	}
 }
 
@@ -60,4 +70,26 @@ func logLevel(s *string) zerolog.Level {
 		lvl = zerolog.ErrorLevel
 	}
 	return lvl
+}
+
+func envName(s *string) env.Name {
+
+	var name env.Name
+
+	// dereference the string pointer to get flag value
+	ds := *s
+
+	switch ds {
+	case "dev":
+		name = env.Dev
+	case "qa":
+		name = env.QA
+	case "stg":
+		name = env.Staging
+	case "prod":
+		name = env.Production
+	default:
+		name = env.Dev
+	}
+	return name
 }

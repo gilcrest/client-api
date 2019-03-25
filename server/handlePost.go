@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/gilcrest/apiclient"
+	"github.com/gilcrest/env/datastore"
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/httplog"
-	"github.com/gilcrest/srvr/datastore"
 )
 
 // CreateClientHandler is used to create a new client (aka app)
@@ -76,7 +76,7 @@ func (s *Server) handleClient() http.HandlerFunc {
 
 		// Call the CreateClientDB method of the Client object
 		// to write to the db
-		err = client.CreateClientDB(ctx, tx)
+		err = client.CreateClientDB(ctx, s.Logger, tx)
 		if err != nil {
 			if rollbackErr := tx.Rollback(); rollbackErr != nil {
 				err = errors.RE(http.StatusInternalServerError, errors.Database)
